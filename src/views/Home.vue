@@ -65,7 +65,7 @@
       return {
         form: {
           level: 1,
-          salary: 1000,
+          salary: 10000,
           buy: 500,
           reward: 0,
           socialSecurity: 100,
@@ -111,7 +111,8 @@
         this.formList.map((item, index) => {
           const { salary, buy, reward, socialSecurity, accumulationFund, specialDeduction } = item;
           const curSumInput = salary + buy + reward; //当前收入：工资+员工购+奖金
-          const curTaxableIncome = curSumInput - socialSecurity - accumulationFund - specialDeduction - BASE; //当前应税所得额 收入-社保公积金-专项扣除-起征点
+          let curTaxableIncome = curSumInput - socialSecurity - accumulationFund - specialDeduction - BASE; //当前应税所得额 收入-社保公积金-专项扣除-起征点
+          curTaxableIncome = curTaxableIncome < 0 ? 0 : curTaxableIncome
 
           sumInput += curSumInput;
           sumInputNotTax += socialSecurity + accumulationFund; //社保+公积金
@@ -129,8 +130,9 @@
         })
       },
       getMatchRule(num) {
-        const matchIndex = RULE.findIndex(item => num <= item.min)
-        return RULE[matchIndex - 1];
+        let matchIndex = RULE.findIndex(item => num <= item.min)
+        matchIndex = matchIndex > 0 ? matchIndex - 1 : 0;
+        return RULE[matchIndex];
       },
       remove({ month }) {
         const matchIndex = this.formList.findIndex(item => item.month === month)
