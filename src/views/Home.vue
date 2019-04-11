@@ -1,18 +1,147 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <el-row :gutter="10">
+      <el-col :xs="24" :sm="8" :md="7" :lg="6" :xl="4" v-for='(form, index) in formList' :key='index'>
+        <el-card class="box-card">
+          <div slot="header" class="clearfix">
+            <span>{{form.month}}月</span>
+            <el-button @click="remove(form)" v-if="index === formList.length-1" style="float: right; padding: 3px 0" type="text">X</el-button>
+            <br />
+            <span>档位: {{form.level}}</span>
+            <br />
+            <span>未扣个税合计金额: {{form.taxableIncome}}</span>
+            <br />
+            <span>预扣缴个税额: {{form.taxAmount}}</span>
+          </div>
+          <el-form ref="form" :model="form" label-width="124px">
+            <el-form-item label="月工资">
+              <el-input v-model.number="form.salary"></el-input>
+            </el-form-item>
+            <el-form-item label="员工购">
+              <el-input v-model.number="form.buy"></el-input>
+            </el-form-item>
+            <el-form-item label="项目奖">
+              <el-input v-model.number="form.reward"></el-input>
+            </el-form-item>
+            <el-form-item label="社保扣款">
+              <el-input v-model.number="form.socialSecurity"></el-input>
+            </el-form-item>
+            <el-form-item label="公积金扣款">
+              <el-input v-model.number="form.accumulationFund"></el-input>
+            </el-form-item>
+            <el-form-item label="个税专项扣除">
+              <el-input v-model.number="form.specialDeduction"></el-input>
+            </el-form-item>
+          </el-form>
+        </el-card>
+      </el-col>
+      <el-col>
+        <el-button @click="add">新增</el-button>
+        <el-button type="success" @click="count">计算</el-button>
+
+      </el-col>
+    </el-row>
+
+
   </div>
+
 </template>
+<script type='text/javascript'>
+const BASE = 5000;
+const RULE = [
+  { level: 1, min: 0, rate: 0.03, num: 0 },
 
-<script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue';
+  { level: 2, min: 36000, rate: 0.1, num: 2520 },
 
+  { level: 3, min: 144000, rate: 0.2, num: 16920 },
+
+  { level: 4, min: 300000, rate: 0.25, num: 31920 },
+
+  { level: 5, min: 420000, rate: 0.3, num: 52920 },
+
+  { level: 6, min: 660000, rate: 0.35, num: 85920 },
+
+  { level: 7, min: 960000, rate: 0.45, num: 181920 },
+]
 export default {
-  name: 'home',
-  components: {
-    HelloWorld,
+  name: '',
+  data() {
+    return {
+      form: {
+        salary: 17500,
+        buy: 500,
+        reward: 0,
+        socialSecurity: 402.78,
+        accumulationFund: 185,
+        specialDeduction: 1500,
+        taxableIncome: 0,
+        taxAmount: 0,
+      },
+      formList: [
+        { 'month': 1, 'salary': 17500, 'buy': 500, 'reward': 100, 'socialSecurity': 402.78, 'accumulationFund': 185, 'specialDeduction': 0, 'taxableIncome': 0, 'taxAmount': 0, 'level': 0 },
+        { 'month': 2, 'salary': 17500, 'buy': 485.9, 'reward': 0, 'socialSecurity': 402.78, 'accumulationFund': 185, 'specialDeduction': 3000, 'taxableIncome': 0, 'taxAmount': 0, 'level': 0 },
+        { 'month': 3, 'salary': 17500, 'buy': 499, 'reward': 0, 'socialSecurity': 402.78, 'accumulationFund': 185, 'specialDeduction': 1500, 'taxableIncome': 0, 'taxAmount': 0, 'level': 0 },
+        { 'month': 4, 'salary': 17500, 'buy': 500, 'reward': 350, 'socialSecurity': 402.78, 'accumulationFund': 185, 'specialDeduction': 1500, 'taxableIncome': 0, 'taxAmount': 0, 'level': 0 },
+      ],
+    }
   },
-};
+  computed: {
+    currentMonth() {
+      const formListL = this.formList.length;
+      return  formListL ? this.formList[formListL-1]['month'] + '月' : ''
+    }
+  },
+  methods: {
+    add() {
+      const formList = this.formList;
+      const listLen = formList.length;
+      const item = { ...this.form, month: listLen + 1, taxableIncome: 0, taxAmount: 0 }
+      formList.push(item)
+    },
+    count() {
+
+      let sumInput = 0; //累积收入
+      let sumInputNotTax = 0; //累积免税收入
+      let sumDeduction = 0; //累积减除费用
+      let sumSpecialDeduction = 0; //累积专项扣除
+
+      let taxableIncomeSum = 0; //应税所得额总和
+      let taxAmountPaySum = 0; //已缴税总和
+
+      this.formList.map((item, index) => {
+        const { salary, buy, reward, socialSecurity, accumulationFund, specialDeduction } = item;
+        const curSumInput = salary + buy + reward; //当前收入：工资+员工购+奖金
+        const curTaxableIncome= curSumInput - socialSecurity - accumulationFund - specialDeduction - BASE;//当前应税所得额 收入-社保公积金-专项扣除-起征点
+
+        sumInput += curSumInput;
+        sumInputNotTax += socialSecurity + accumulationFund; //社保+公积金
+        sumDeduction += BASE; //5000的免征点
+        sumSpecialDeduction += specialDeduction;
+
+        taxableIncomeSum += curTaxableIncome;//应税所得额总和
+        taxAmountPaySum += index > 0 ? this.formList[index-1]['taxAmount'] : 0;//已缴税总和
+
+        const matchRule = this.getMatchRule(taxableIncomeSum); //根据应税所得额总和找到适合对档位
+        const curTaxAmount = taxableIncomeSum * matchRule.rate - matchRule.num - taxAmountPaySum;
+        item.taxAmount = Number(curTaxAmount.toFixed(2));
+        item.level = matchRule.level
+        item.taxableIncome = Number((curTaxableIncome + BASE + specialDeduction).toFixed(2))
+      })
+    },
+    getMatchRule(num) {
+      const matchIndex = RULE.findIndex(item => num <= item.min)
+      return RULE[matchIndex - 1];
+    },
+    remove({month}) {
+      const matchIndex = this.formList.findIndex(item => item.month === month)
+      this.formList.splice(matchIndex, 1)
+    },
+    onSubmit() {
+      this.count()
+    }
+  },
+}
 </script>
+<style lang='scss' scoped>
+
+</style>
