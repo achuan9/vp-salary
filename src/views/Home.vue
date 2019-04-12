@@ -6,9 +6,9 @@
           <div slot="header" class="card-header clearfix">
             <h3>{{form.month}}月份</h3>
             <el-button @click="remove(form)" v-if="index === formList.length-1" style="float: right; padding: 3px 0" type="text">X</el-button>
-            <p>档位: {{form.level}}</p>
-            <p>未扣个税合计金额: {{form.taxableIncome}}</p>
-            <p>预扣缴个税额: {{form.taxAmount}}</p>
+            <p>档位: <span class="text-warn">{{form.level}}</span></p>
+            <p>未扣个税合计金额: <span class="text-warn">{{form.taxableIncome}}</span></p>
+            <p>预扣缴个税额: <span class="text-warn">{{form.taxAmount}}</span></p>
           </div>
           <el-form ref="form" :model="form" label-width="124px">
             <el-form-item label="月工资">
@@ -59,22 +59,22 @@
     { level: 6, min: 660000, rate: 0.35, num: 85920 },
 
     { level: 7, min: 960000, rate: 0.45, num: 181920 },
-  ]
+  ];
+  const FORE_INIT = {
+    level: 1,
+    salary: 10000,
+    buy: 500,
+    reward: 0,
+    socialSecurity: 100,
+    accumulationFund: 50,
+    specialDeduction: 1500,
+    taxableIncome: 0,
+    taxAmount: 0,
+  };
   export default {
     name: '',
     data() {
       return {
-        form: {
-          level: 1,
-          salary: 10000,
-          buy: 500,
-          reward: 0,
-          socialSecurity: 100,
-          accumulationFund: 50,
-          specialDeduction: 1500,
-          taxableIncome: 0,
-          taxAmount: 0,
-        },
         formList: JSON.parse(window.localStorage.getItem(STORE_KEY)) || [],
       }
     },
@@ -91,7 +91,8 @@
       add() {
         const formList = this.formList;
         const listLen = formList.length;
-        const item = { ...formList[listLen-1], month: listLen + 1, taxableIncome: 0, taxAmount: 0 }
+        const addItem = !!listLen ? formList[listLen - 1] : FORE_INIT;
+        const item = { ...addItem, month: listLen + 1, taxableIncome: 0, taxAmount: 0 }
         formList.push(item)
       },
       count() {
@@ -127,7 +128,7 @@
         window.localStorage.setItem(STORE_KEY, JSON.stringify(this.formList))
 
       },
-      getMatchRule(num) {//获取档位
+      getMatchRule(num) { //获取档位
         let matchIndex = RULE.findIndex(item => num <= item.min)
         matchIndex = matchIndex > 0 ? matchIndex - 1 : 0;
         return RULE[matchIndex];
@@ -154,6 +155,11 @@
     p {
       margin: 0;
       line-height: 1.2em;
+    }
+
+    .text-warn {
+      color: brown;
+      font-weight: bold;
     }
   }
 </style>
