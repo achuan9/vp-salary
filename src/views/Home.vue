@@ -12,22 +12,22 @@
           </div>
           <el-form ref="form" :model="form" label-width="124px">
             <el-form-item label="月工资">
-              <el-input v-model.number="form.salary"></el-input>
+              <el-input v-model="form.salary"></el-input>
             </el-form-item>
             <el-form-item label="员工购">
-              <el-input v-model.number="form.buy"></el-input>
+              <el-input v-model="form.buy"></el-input>
             </el-form-item>
             <el-form-item label="项目奖">
-              <el-input v-model.number="form.reward"></el-input>
+              <el-input v-model="form.reward"></el-input>
             </el-form-item>
             <el-form-item label="社保扣款">
-              <el-input v-model.number="form.socialSecurity"></el-input>
+              <el-input v-model="form.socialSecurity"></el-input>
             </el-form-item>
             <el-form-item label="公积金扣款">
-              <el-input v-model.number="form.accumulationFund"></el-input>
+              <el-input v-model="form.accumulationFund"></el-input>
             </el-form-item>
             <el-form-item label="个税专项扣除">
-              <el-input v-model.number="form.specialDeduction"></el-input>
+              <el-input v-model="form.specialDeduction"></el-input>
             </el-form-item>
           </el-form>
         </el-card>
