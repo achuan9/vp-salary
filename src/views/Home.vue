@@ -43,6 +43,7 @@
 
 </template>
 <script type='text/javascript'>
+  const STORE_KEY = "salary";
   const BASE = 5000;
   const RULE = [
     { level: 1, min: 0, rate: 0.03, num: 0 },
@@ -74,12 +75,7 @@
           taxableIncome: 0,
           taxAmount: 0,
         },
-        formList: [
-          // { 'month': 1, 'salary': 17500, 'buy': 500, 'reward': 100, 'socialSecurity': 402.78, 'accumulationFund': 185, 'specialDeduction': 0, 'taxableIncome': 0, 'taxAmount': 0, 'level': 0 },
-          // { 'month': 2, 'salary': 17500, 'buy': 485.9, 'reward': 0, 'socialSecurity': 402.78, 'accumulationFund': 185, 'specialDeduction': 3000, 'taxableIncome': 0, 'taxAmount': 0, 'level': 0 },
-          // { 'month': 3, 'salary': 17500, 'buy': 499, 'reward': 0, 'socialSecurity': 402.78, 'accumulationFund': 185, 'specialDeduction': 1500, 'taxableIncome': 0, 'taxAmount': 0, 'level': 0 },
-          // { 'month': 4, 'salary': 17500, 'buy': 500, 'reward': 350, 'socialSecurity': 402.78, 'accumulationFund': 185, 'specialDeduction': 1500, 'taxableIncome': 0, 'taxAmount': 0, 'level': 0 },
-        ],
+        formList: JSON.parse(window.localStorage.getItem(STORE_KEY)) || [],
       }
     },
     computed: {
@@ -89,13 +85,13 @@
       }
     },
     created() {
-      this.add();
+      !this.formList.length && this.add();
     },
     methods: {
       add() {
         const formList = this.formList;
         const listLen = formList.length;
-        const item = { ...this.form, month: listLen + 1, taxableIncome: 0, taxAmount: 0 }
+        const item = { ...formList[listLen-1], month: listLen + 1, taxableIncome: 0, taxAmount: 0 }
         formList.push(item)
       },
       count() {
@@ -128,8 +124,10 @@
           item.level = matchRule.level
           item.taxableIncome = Number((curTaxableIncome + BASE + specialDeduction).toFixed(2))
         })
+        window.localStorage.setItem(STORE_KEY, JSON.stringify(this.formList))
+
       },
-      getMatchRule(num) {
+      getMatchRule(num) {//获取档位
         let matchIndex = RULE.findIndex(item => num <= item.min)
         matchIndex = matchIndex > 0 ? matchIndex - 1 : 0;
         return RULE[matchIndex];
