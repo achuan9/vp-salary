@@ -12,22 +12,22 @@
           </div>
           <el-form ref="form" :model="form" label-width="124px">
             <el-form-item label="月工资">
-              <el-input v-model="form.salary"></el-input>
+              <el-input type="number" v-model="form.salary"></el-input>
             </el-form-item>
             <el-form-item label="员工购">
-              <el-input v-model="form.buy"></el-input>
+              <el-input type="number" v-model="form.buy"></el-input>
             </el-form-item>
             <el-form-item label="项目奖">
-              <el-input v-model="form.reward"></el-input>
+              <el-input  type="number" v-model="form.reward"></el-input>
             </el-form-item>
             <el-form-item label="社保扣款">
-              <el-input v-model="form.socialSecurity"></el-input>
+              <el-input  type="number" v-model="form.socialSecurity"></el-input>
             </el-form-item>
             <el-form-item label="公积金扣款">
-              <el-input v-model="form.accumulationFund"></el-input>
+              <el-input  type="number" v-model="form.accumulationFund"></el-input>
             </el-form-item>
             <el-form-item label="个税专项扣除">
-              <el-input v-model="form.specialDeduction"></el-input>
+              <el-input  type="number" v-model="form.specialDeduction"></el-input>
             </el-form-item>
           </el-form>
         </el-card>
@@ -107,14 +107,15 @@
 
         this.formList.map((item, index) => {
           const { salary, buy, reward, socialSecurity, accumulationFund, specialDeduction } = item;
-          const curSumInput = salary + buy + reward; //当前收入：工资+员工购+奖金
-          let curTaxableIncome = curSumInput - socialSecurity - accumulationFund - specialDeduction - BASE; //当前应税所得额 收入-社保公积金-专项扣除-起征点
+          const curSumInput = Number(salary) + Number(buy) + Number(reward); //当前收入：工资+员工购+奖金
+          const socialAccu = Number(socialSecurity) + Number(accumulationFund);//社保+公积金
+          let curTaxableIncome = curSumInput - socialAccu - Number(specialDeduction) - BASE; //当前应税所得额 收入-社保公积金-专项扣除-起征点
           curTaxableIncome = curTaxableIncome < 0 ? 0 : curTaxableIncome
 
           sumInput += curSumInput;
-          sumInputNotTax += socialSecurity + accumulationFund; //社保+公积金
+          sumInputNotTax += socialAccu;
           sumDeduction += BASE; //5000的免征点
-          sumSpecialDeduction += specialDeduction;
+          sumSpecialDeduction += Number(specialDeduction);
 
           taxableIncomeSum += curTaxableIncome; //应税所得额总和
           taxAmountPaySum += index > 0 ? this.formList[index - 1]['taxAmount'] : 0; //已缴税总和
