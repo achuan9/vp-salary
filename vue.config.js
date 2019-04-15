@@ -1,5 +1,5 @@
 module.exports = {
-  publicPath: "/vp-salary/dist",
+  publicPath: "/vp-salary/",
   lintOnSave: false,
   configureWebpack: {
     resolve: {
