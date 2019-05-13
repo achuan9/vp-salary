@@ -3,8 +3,7 @@ import '@babel/polyfill';
 import App from './App.vue';
 import router from './router';
 
-import "./element-ui";
-
+import './element-ui';
 
 Vue.config.productionTip = false;
 

@@ -1,5 +1,5 @@
 module.exports = {
-  publicPath: "/vp-salary/",
+  publicPath: '/',
   lintOnSave: false,
   configureWebpack: {
     resolve: {
@@ -7,5 +7,5 @@ module.exports = {
     },
   },
   // 设为false打包时不生成.map文件
-  productionSourceMap: false
+  productionSourceMap: false,
 };
